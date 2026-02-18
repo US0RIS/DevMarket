@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CodeVault — Buy & Sell Code</title>
+<title>CodeVault — Buy &amp; Sell Code</title>
+<meta name="description" content="The marketplace for developer-crafted code. Upload your scripts, components, and tools. Buyers preview, negotiate, and license directly from developers.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -18,719 +19,235 @@
     --muted: #6b6b80;
     --code-bg: #0d0d14;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Syne', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Grain overlay */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.4;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.4;
   }
 
   /* NAV */
-  nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.2rem 3rem;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: rgba(10,10,15,0.92);
-    backdrop-filter: blur(20px);
-    z-index: 100;
-  }
-
-  .logo {
-    font-size: 1.4rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-  }
-
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(10,10,15,0.93); backdrop-filter: blur(20px); z-index: 100; }
+  .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none; }
   .logo span { color: var(--accent); }
-  .logo-icon { font-size: 1.2rem; }
+  .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
 
-  .nav-actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.55rem 1.2rem;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.01em;
-  }
-
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
+  /* BUTTONS */
+  .btn { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600; padding: 0.55rem 1.2rem; border-radius: 6px; border: none; cursor: pointer; transition: all 0.18s; letter-spacing: 0.01em; white-space: nowrap; }
+  .btn:disabled { opacity: 0.4; pointer-events: none; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #000;
-  }
+  .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { background: #00ffc0; transform: translateY(-1px); }
-
-  .btn-purple {
-    background: var(--accent2);
-    color: #fff;
-  }
+  .btn-purple { background: var(--accent2); color: #fff; }
   .btn-purple:hover { background: #9585ff; transform: translateY(-1px); }
-
-  .btn-danger {
-    background: transparent;
-    border: 1px solid var(--accent3);
-    color: var(--accent3);
-  }
+  .btn-danger { background: transparent; border: 1px solid var(--accent3); color: var(--accent3); }
   .btn-danger:hover { background: var(--accent3); color: #fff; }
+  .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
+  .full-width { width: 100%; }
 
   /* HERO */
-  .hero {
-    padding: 5rem 3rem 3rem;
-    max-width: 900px;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero h1 {
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    margin-bottom: 1.2rem;
-  }
-
-  .hero h1 .hl { color: var(--accent); }
+  .hero { padding: 5rem 3rem 3rem; max-width: 900px; animation: fadeUp 0.6s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .hero h1 { font-size: clamp(2.4rem, 5vw, 4.4rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 1.2rem; }
+  .hero h1 .hl  { color: var(--accent); }
   .hero h1 .hl2 { color: var(--accent2); }
+  .hero p { font-size: 1rem; color: var(--muted); max-width: 520px; line-height: 1.75; font-family: 'DM Mono', monospace; }
 
-  .hero p {
-    font-size: 1.05rem;
-    color: var(--muted);
-    max-width: 520px;
-    line-height: 1.7;
-    font-weight: 400;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* STATS BAR */
-  .stats-bar {
-    display: flex;
-    gap: 3rem;
-    padding: 1.5rem 3rem;
-    border-bottom: 1px solid var(--border);
-    animation: fadeUp 0.6s 0.1s ease both;
-  }
-
+  /* STATS */
+  .stats-bar { display: flex; gap: 3rem; padding: 1.5rem 3rem; border-bottom: 1px solid var(--border); animation: fadeUp 0.6s 0.1s ease both; }
   .stat { display: flex; flex-direction: column; gap: 0.15rem; }
   .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--accent); letter-spacing: -0.03em; }
   .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; }
 
-  /* MAIN LAYOUT */
-  .main {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    min-height: calc(100vh - 220px);
-  }
+  /* LAYOUT */
+  .main { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 240px); }
 
   /* SIDEBAR */
-  .sidebar {
-    border-right: 1px solid var(--border);
-    padding: 2rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    animation: fadeUp 0.6s 0.2s ease both;
-  }
-
-  .sidebar-section h3 {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    margin-bottom: 0.8rem;
-    font-family: 'DM Mono', monospace;
-  }
-
+  .sidebar { border-right: 1px solid var(--border); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; animation: fadeUp 0.6s 0.2s ease both; }
+  .sidebar-section h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.8rem; font-family: 'DM Mono', monospace; }
   .filter-group { display: flex; flex-direction: column; gap: 0.4rem; }
-
-  .filter-btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 600;
-    padding: 0.6rem 0.9rem;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--muted);
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
+  .filter-btn { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 600; padding: 0.6rem 0.9rem; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--muted); text-align: left; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: space-between; }
   .filter-btn:hover { color: var(--text); background: var(--surface2); }
   .filter-btn.active { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
-
-  .filter-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    background: var(--border);
-    border-radius: 20px;
-    padding: 0.1rem 0.45rem;
-    color: var(--muted);
-  }
+  .filter-badge { font-family: 'DM Mono', monospace; font-size: 0.7rem; background: var(--border); border-radius: 20px; padding: 0.1rem 0.45rem; color: var(--muted); }
 
   /* CONTENT */
-  .content {
-    padding: 2rem 2.5rem;
-    animation: fadeUp 0.6s 0.3s ease both;
-  }
-
-  .content-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-
-  .content-header h2 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .search-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.55rem 1rem;
-    width: 280px;
-    transition: border-color 0.2s;
-  }
+  .content { padding: 2rem 2.5rem; animation: fadeUp 0.6s 0.3s ease both; }
+  .content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+  .content-header h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+  .content-header-right { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; }
+  .search-bar { display: flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 1rem; width: 260px; transition: border-color 0.2s; }
   .search-bar:focus-within { border-color: var(--accent2); }
-  .search-bar input {
-    background: none;
-    border: none;
-    outline: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    color: var(--text);
-    width: 100%;
-  }
-  .search-bar input::placeholder { color: var(--muted); }
-  .search-icon { color: var(--muted); font-size: 0.9rem; }
+  .search-bar input { background: none; border: none; outline: none; font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text); width: 100%; }
+  .search-icon { color: var(--muted); font-size: 0.9rem; flex-shrink: 0; }
 
   /* GRID */
-  .listings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.2rem;
-  }
+  .listings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.2rem; }
 
   /* CARD */
-  .listing-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-  }
-  .listing-card:hover {
-    border-color: var(--accent2);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(124,106,245,0.12);
-  }
+  .listing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; }
+  .listing-card:hover { border-color: var(--accent2); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(124,106,245,0.12); }
 
-  .card-preview {
-    background: var(--code-bg);
-    padding: 1rem;
-    height: 140px;
-    overflow: hidden;
-    position: relative;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .card-preview pre {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    line-height: 1.6;
-    color: #8888aa;
-    white-space: pre;
-    overflow: hidden;
-  }
-
-  .card-preview-blur {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 60px;
-    background: linear-gradient(transparent, var(--code-bg));
-  }
-
-  .lang-badge {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-
-  .lang-js { background: #1a1400; color: #f7df1e; border: 1px solid #3a3200; }
-  .lang-py { background: #001a1a; color: #3776ab; border: 1px solid #003333; }
-  .lang-ts { background: #00101a; color: #3178c6; border: 1px solid #001f33; }
-  .lang-css { background: #0d001a; color: #264de4; border: 1px solid #1a003a; }
+  /* Card preview — code is ALWAYS visually locked */
+  .card-preview { background: var(--code-bg); padding: 1rem; height: 140px; overflow: hidden; position: relative; border-bottom: 1px solid var(--border); user-select: none; }
+  .card-preview pre { font-family: 'DM Mono', monospace; font-size: 0.7rem; line-height: 1.65; color: #5a5a7a; white-space: pre; overflow: hidden; filter: blur(4px); pointer-events: none; }
+  .card-preview-blur { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; background: linear-gradient(transparent, var(--code-bg)); }
+  .card-preview-lock { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; opacity: 0.2; }
+  .lang-badge { position: absolute; top: 0.6rem; right: 0.6rem; font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 500; pointer-events: none; }
+  .lang-js   { background: #1a1400; color: #f7df1e; border: 1px solid #3a3200; }
+  .lang-py   { background: #001a1a; color: #4b8bbe; border: 1px solid #003333; }
+  .lang-ts   { background: #00101a; color: #3178c6; border: 1px solid #001f33; }
+  .lang-css  { background: #0d001a; color: #7b68ee; border: 1px solid #1a003a; }
   .lang-html { background: #1a0800; color: #e44d26; border: 1px solid #3a1500; }
-  .lang-other { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .lang-other{ background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
-  .card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+  .card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
   .card-title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.02em; }
-  .card-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; font-family: 'DM Mono', monospace; flex: 1; }
-
-  .card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 0.5rem;
-    padding-top: 0.7rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .card-seller {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-  }
+  .card-desc  { font-size: 0.78rem; color: var(--muted); line-height: 1.55; font-family: 'DM Mono', monospace; flex: 1; }
+  .card-meta  { display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; padding-top: 0.7rem; border-top: 1px solid var(--border); }
+  .card-seller        { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; }
   .card-seller strong { color: var(--accent2); }
-
-  .card-prices { display: flex; flex-direction: column; align-items: flex-end; gap: 0.15rem; }
-  .price-buy { font-size: 0.95rem; font-weight: 800; color: var(--accent); }
-  .price-license { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .card-prices        { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+  .price-buy          { font-size: 0.95rem; font-weight: 800; color: var(--accent); }
+  .price-license      { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
 
   /* EMPTY STATE */
-  .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--muted);
-  }
-  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
-  .empty-state p { font-family: 'DM Mono', monospace; font-size: 0.85rem; }
+  .empty-state { grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; color: var(--muted); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1.2rem; opacity: 0.25; }
+  .empty-state h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); opacity: 0.55; }
+  .empty-state p { font-family: 'DM Mono', monospace; font-size: 0.82rem; line-height: 1.7; }
 
-  /* MODAL BASE */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(6px);
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: scale(0.96) translateY(16px);
-    transition: transform 0.25s;
-  }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-height: 92vh; overflow-y: auto; scrollbar-width: thin; transform: scale(0.96) translateY(14px); transition: transform 0.25s; }
   .modal-overlay.open .modal { transform: scale(1) translateY(0); }
-
-  .modal-sm { max-width: 500px; }
-  .modal-lg { max-width: 820px; }
-  .modal-xl { max-width: 1000px; }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem 1.8rem;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--surface);
-    z-index: 5;
-  }
-
+  .modal-sm { max-width: 460px; }
+  .modal-lg { max-width: 780px; }
+  .modal-xl { max-width: 980px; }
+  .modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 5; }
   .modal-header h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
-
-  .close-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    padding: 0.3rem;
-    border-radius: 4px;
-    transition: color 0.15s;
-  }
+  .modal-subtitle { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 0.25rem; line-height: 1.5; }
+  .close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0.3rem; border-radius: 4px; transition: color 0.15s; flex-shrink: 0; }
   .close-btn:hover { color: var(--text); }
-
   .modal-body { padding: 1.8rem; }
 
-  /* FORM */
-  .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
-  .form-label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-  }
-
-  .form-input, .form-select, .form-textarea {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.88rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.7rem 0.9rem;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-    width: 100%;
-  }
+  /* FORMS */
+  .form-group { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1.1rem; }
+  .form-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .form-hint  { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; line-height: 1.5; }
+  .form-input, .form-select, .form-textarea { font-family: 'DM Mono', monospace; font-size: 0.88rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 0.9rem; color: var(--text); outline: none; transition: border-color 0.15s; width: 100%; }
   .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent2); }
   .form-select option { background: var(--surface2); }
-  .form-textarea { min-height: 80px; resize: vertical; }
-
+  .form-textarea { min-height: 85px; resize: vertical; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-error { font-size: 0.75rem; color: var(--accent3); font-family: 'DM Mono', monospace; display: none; }
 
   /* CODE UPLOAD */
-  .code-drop-zone {
-    border: 2px dashed var(--border);
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-  }
-  .code-drop-zone:hover, .code-drop-zone.dragover {
-    border-color: var(--accent2);
-    background: rgba(124,106,245,0.05);
-  }
-  .code-drop-zone input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer;
-  }
-  .drop-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
-  .drop-text { font-size: 0.82rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .code-drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+  .code-drop-zone:hover, .code-drop-zone.dragover { border-color: var(--accent2); background: rgba(124,106,245,0.04); }
+  .code-drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-icon { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.4; }
+  .drop-text { font-size: 0.82rem; color: var(--muted); font-family: 'DM Mono', monospace; line-height: 1.65; }
   .drop-text strong { color: var(--accent2); }
-
-  .code-editor-wrap {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .code-editor-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .code-editor-wrap { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 0.6rem; }
+  .code-editor-header { display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
-  .code-filename {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-left: 0.5rem;
-  }
+  .code-filename { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); margin-left: 0.4rem; }
+  .code-textarea { width: 100%; min-height: 220px; background: var(--code-bg); border: none; padding: 1rem; font-family: 'DM Mono', monospace; font-size: 0.82rem; line-height: 1.65; color: #9090b0; outline: none; resize: vertical; tab-size: 2; }
 
-  .code-textarea {
-    width: 100%;
-    min-height: 220px;
-    background: var(--code-bg);
-    border: none;
-    padding: 1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.82rem;
-    line-height: 1.65;
-    color: #b8c0cc;
-    outline: none;
-    resize: vertical;
-  }
+  /* DETAIL VIEW */
+  .detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; }
 
-  /* LISTING DETAIL */
-  .detail-grid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; }
+  /* ── CRITICAL: Code container rules ──
+     .blurred  = non-owner view — code blurred at CSS level AND replaced with fake content in JS
+     .owner-view = seller only — real code shown, no blur
+     The lock overlay covers the blurred state visually.
+  */
+  .code-preview-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; position: relative; }
+  .code-preview-box pre { padding: 1.2rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 1.65; color: #7070a0; overflow-x: auto; max-height: 380px; overflow-y: auto; }
+  .code-preview-box.blurred pre { filter: blur(6px); user-select: none; pointer-events: none; }
+  .code-preview-box.owner-view pre { filter: none; color: #b0b0d0; }
+  .code-lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.7rem; background: rgba(10,10,15,0.6); }
+  .code-lock-icon { font-size: 2rem; }
+  .code-lock-text { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); text-align: center; line-height: 1.65; max-width: 260px; }
 
-  .detail-code-preview {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .detail-code-preview pre {
-    padding: 1.2rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    line-height: 1.65;
-    color: #8888aa;
-    overflow-x: auto;
-    max-height: 400px;
-    overflow-y: auto;
-  }
-
+  /* DETAIL SIDEBAR */
   .detail-sidebar { display: flex; flex-direction: column; gap: 1rem; }
-
-  .price-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.2rem;
-  }
-  .price-card-title {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    margin-bottom: 0.6rem;
-  }
-  .price-amount { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.3rem; }
-  .price-desc { font-size: 0.75rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 1rem; line-height: 1.5; }
-
-  .divider { height: 1px; background: var(--border); margin: 1rem 0; }
-
-  .tag-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-  .tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    padding: 0.2rem 0.6rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--muted);
-  }
-
-  .seller-info {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 1rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .seller-avatar {
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 1rem;
-    flex-shrink: 0;
-  }
+  .price-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+  .price-card-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
+  .price-amount { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.25rem; }
+  .price-desc { font-size: 0.74rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 1rem; line-height: 1.55; }
+  .info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 0.35rem 0; }
+  .info-row .label { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
+  .info-row .value { font-weight: 600; font-size: 0.82rem; }
+  .seller-card { display: flex; align-items: center; gap: 0.8rem; padding: 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; }
+  .seller-avatar { width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, var(--accent2), var(--accent)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; color: #000; }
   .seller-name { font-size: 0.9rem; font-weight: 700; }
-  .seller-join { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+  .seller-sub  { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 0.7rem; padding: 0.2rem 0.6rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; color: var(--muted); }
+  .divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
 
-  /* OFFERS SECTION */
-  .offers-section { margin-top: 1.2rem; }
-  .offers-section h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.8rem; }
-
-  .offer-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.9rem 1rem;
-    margin-bottom: 0.6rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .offer-info { display: flex; flex-direction: column; gap: 0.2rem; }
-  .offer-buyer { font-size: 0.82rem; font-weight: 600; }
-  .offer-type {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    padding: 0.15rem 0.4rem;
-    border-radius: 3px;
-    display: inline-block;
-    margin-top: 0.15rem;
-  }
-  .offer-type-buy { background: rgba(0,229,160,0.1); color: var(--accent); }
+  /* OFFERS */
+  .offer-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; margin-bottom: 0.6rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .offer-info { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
+  .offer-buyer { font-size: 0.84rem; font-weight: 600; }
+  .offer-type { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 3px; display: inline-block; }
+  .offer-type-buy     { background: rgba(0,229,160,0.1); color: var(--accent); }
   .offer-type-license { background: rgba(124,106,245,0.1); color: var(--accent2); }
+  .offer-message { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; line-height: 1.5; }
+  .offer-right  { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; flex-shrink: 0; }
   .offer-amount { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
-  .offer-actions { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
-
-  .offer-status-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-  }
-  .badge-pending { background: rgba(255,193,7,0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.2); }
-  .badge-accepted { background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); }
+  .offer-actions { display: flex; gap: 0.4rem; }
+  .badge { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; }
+  .badge-pending  { background: rgba(255,193,7,0.1);  color: #ffc107; border: 1px solid rgba(255,193,7,0.2); }
+  .badge-accepted { background: rgba(0,229,160,0.1);  color: var(--accent);  border: 1px solid rgba(0,229,160,0.2); }
   .badge-declined { background: rgba(255,107,107,0.1); color: var(--accent3); border: 1px solid rgba(255,107,107,0.2); }
 
-  /* NOTIFICATION TOAST */
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: var(--surface2);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    padding: 0.9rem 1.4rem;
-    font-size: 0.85rem;
-    font-family: 'DM Mono', monospace;
-    z-index: 999;
-    transform: translateY(20px);
-    opacity: 0;
-    transition: all 0.3s;
-    max-width: 320px;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  /* MY DASHBOARD */
+  /* DASHBOARD */
   .dashboard-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
-  .tab-btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.55rem 1.2rem;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+  .tab-btn { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600; padding: 0.55rem 1.2rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .tab-btn.active { background: var(--surface2); border-color: var(--accent2); color: var(--accent2); }
-  .tab-btn:hover { color: var(--text); }
-
   .tab-content { display: none; }
   .tab-content.active { display: block; }
-
-  .listing-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 0.6rem;
-  }
-  .listing-row-info { flex: 1; }
-  .listing-row-title { font-size: 0.9rem; font-weight: 700; }
-  .listing-row-meta { font-size: 0.73rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 0.2rem; }
+  .listing-row { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.6rem; }
+  .listing-row-info { flex: 1; min-width: 0; }
+  .listing-row-title { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .listing-row-meta  { font-size: 0.73rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 0.2rem; }
   .listing-row-price { font-size: 1rem; font-weight: 800; color: var(--accent); white-space: nowrap; }
-  .listing-row-actions { display: flex; gap: 0.4rem; }
+  .listing-row-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
 
-  /* SYNTAX COLORS */
-  .kw { color: #c792ea; }
-  .fn { color: #82aaff; }
-  .str { color: #c3e88d; }
-  .num { color: #f78c6c; }
-  .cmt { color: #546e7a; font-style: italic; }
-  .op { color: #89ddff; }
+  /* USER BADGE */
+  .user-badge { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.85rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .user-badge:hover { border-color: var(--accent2); }
+  .user-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  /* TOAST */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1.3rem; font-size: 0.84rem; font-family: 'DM Mono', monospace; z-index: 9998; transform: translateY(16px); opacity: 0; transition: all 0.25s; max-width: 320px; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--accent); color: var(--accent); }
+  .toast.error   { border-color: var(--accent3); color: var(--accent3); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
-  .hidden { display: none !important; }
-
-  /* User badge in nav */
-  .user-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.4rem 0.8rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .user-badge:hover { border-color: var(--accent2); }
-  .user-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-
-  .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
-  .full-width { width: 100%; }
-  .mt-sm { margin-top: 0.5rem; }
-
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
-    padding: 0.4rem 0;
-  }
-  .info-row .label { color: var(--muted); font-family: 'DM Mono', monospace; }
-  .info-row .value { font-weight: 600; }
-
-  /* make modal body scroll nicely */
-  .modal { scrollbar-width: thin; }
-
-  @media (max-width: 768px) {
-    nav { padding: 1rem 1.2rem; }
-    .hero { padding: 2.5rem 1.2rem 1.5rem; }
-    .stats-bar { padding: 1rem 1.2rem; gap: 1.5rem; flex-wrap: wrap; }
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.4rem; }
+    .hero { padding: 2.5rem 1.4rem 1.5rem; }
+    .stats-bar { padding: 1rem 1.4rem; gap: 1.5rem; flex-wrap: wrap; }
     .main { grid-template-columns: 1fr; }
     .sidebar { display: none; }
-    .content { padding: 1.5rem 1.2rem; }
+    .content { padding: 1.5rem 1.4rem; }
     .detail-grid { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
+    .search-bar { width: 100%; }
   }
 </style>
 </head>
@@ -738,291 +255,293 @@
 
 <!-- NAV -->
 <nav>
-  <div class="logo" onclick="showView('home')">
-    <span class="logo-icon">⬡</span> Code<span>Vault</span>
-  </div>
-  <div class="nav-actions" id="nav-actions">
-    <button class="btn btn-ghost" onclick="showModal('login-modal')">Sign In</button>
-    <button class="btn btn-primary" onclick="showModal('register-modal')">Join Free</button>
-  </div>
+  <div class="logo" onclick="scrollTo(0,0)">⬡ Code<span>Vault</span></div>
+  <div class="nav-actions" id="nav-actions"></div>
 </nav>
 
 <!-- HERO -->
-<div class="hero" id="hero-section">
+<div class="hero">
   <h1>The marketplace for<br><span class="hl">developer-crafted</span><br><span class="hl2">code.</span></h1>
-  <p>Upload your scripts, components, and tools. Buyers can preview, negotiate, and license — directly from developers.</p>
+  <p>Upload your scripts, components, and tools. Buyers preview, negotiate, and license — directly from developers.</p>
 </div>
 
-<!-- STATS BAR -->
-<div class="stats-bar" id="stats-bar">
-  <div class="stat">
-    <div class="stat-val" id="stat-listings">0</div>
-    <div class="stat-label">listings</div>
-  </div>
-  <div class="stat">
-    <div class="stat-val" id="stat-sellers">0</div>
-    <div class="stat-label">sellers</div>
-  </div>
-  <div class="stat">
-    <div class="stat-val" id="stat-offers">0</div>
-    <div class="stat-label">offers made</div>
-  </div>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val" id="stat-listings">0</div><div class="stat-label">Listings</div></div>
+  <div class="stat"><div class="stat-val" id="stat-sellers">0</div><div class="stat-label">Sellers</div></div>
+  <div class="stat"><div class="stat-val" id="stat-offers">0</div><div class="stat-label">Offers Made</div></div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-section">
       <h3>Language</h3>
-      <div class="filter-group" id="lang-filters">
-        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All <span class="filter-badge" id="fb-all">0</span></button>
-        <button class="filter-btn" data-filter="JavaScript" onclick="setFilter('JavaScript')">JavaScript <span class="filter-badge" id="fb-js">0</span></button>
-        <button class="filter-btn" data-filter="Python" onclick="setFilter('Python')">Python <span class="filter-badge" id="fb-py">0</span></button>
-        <button class="filter-btn" data-filter="TypeScript" onclick="setFilter('TypeScript')">TypeScript <span class="filter-badge" id="fb-ts">0</span></button>
-        <button class="filter-btn" data-filter="CSS" onclick="setFilter('CSS')">CSS <span class="filter-badge" id="fb-css">0</span></button>
-        <button class="filter-btn" data-filter="HTML" onclick="setFilter('HTML')">HTML <span class="filter-badge" id="fb-html">0</span></button>
-        <button class="filter-btn" data-filter="Other" onclick="setFilter('Other')">Other <span class="filter-badge" id="fb-other">0</span></button>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all"        onclick="setFilter('all')">All <span class="filter-badge" id="fb-all">0</span></button>
+        <button class="filter-btn" data-filter="JavaScript"        onclick="setFilter('JavaScript')">JavaScript <span class="filter-badge" id="fb-JavaScript">0</span></button>
+        <button class="filter-btn" data-filter="TypeScript"        onclick="setFilter('TypeScript')">TypeScript <span class="filter-badge" id="fb-TypeScript">0</span></button>
+        <button class="filter-btn" data-filter="Python"            onclick="setFilter('Python')">Python <span class="filter-badge" id="fb-Python">0</span></button>
+        <button class="filter-btn" data-filter="CSS"               onclick="setFilter('CSS')">CSS <span class="filter-badge" id="fb-CSS">0</span></button>
+        <button class="filter-btn" data-filter="HTML"              onclick="setFilter('HTML')">HTML <span class="filter-badge" id="fb-HTML">0</span></button>
+        <button class="filter-btn" data-filter="Other"             onclick="setFilter('Other')">Other <span class="filter-badge" id="fb-Other">0</span></button>
       </div>
     </div>
     <div class="sidebar-section">
       <h3>Sort By</h3>
       <div class="filter-group">
-        <button class="filter-btn active" id="sort-newest" onclick="setSort('newest')">Newest First</button>
-        <button class="filter-btn" id="sort-price-low" onclick="setSort('price-low')">Price: Low → High</button>
-        <button class="filter-btn" id="sort-price-high" onclick="setSort('price-high')">Price: High → Low</button>
+        <button class="filter-btn active" onclick="setSort('newest',this)">Newest First</button>
+        <button class="filter-btn"        onclick="setSort('price-low',this)">Price: Low → High</button>
+        <button class="filter-btn"        onclick="setSort('price-high',this)">Price: High → Low</button>
       </div>
     </div>
   </aside>
 
-  <!-- CONTENT -->
   <div class="content">
     <div class="content-header">
       <h2 id="content-title">Browse Listings</h2>
-      <div style="display:flex;gap:0.7rem;align-items:center;">
+      <div class="content-header-right">
         <div class="search-bar">
           <span class="search-icon">⌕</span>
-          <input type="text" placeholder="Search listings..." id="search-input" oninput="renderListings()">
+          <input type="text" id="search-input" aria-label="Search listings" oninput="renderListings()">
         </div>
-        <button class="btn btn-primary hidden" id="sell-btn" onclick="showModal('sell-modal')">+ Sell Code</button>
+        <button class="btn btn-primary" id="sell-btn" style="display:none" onclick="openSellModal()">+ Sell Code</button>
       </div>
     </div>
     <div class="listings-grid" id="listings-grid"></div>
   </div>
 </div>
 
-<!-- ===== MODALS ===== -->
+<!-- ══════════════ MODALS ══════════════ -->
 
 <!-- LOGIN -->
-<div class="modal-overlay" id="login-modal">
+<div class="modal-overlay" id="login-modal" role="dialog" aria-modal="true">
   <div class="modal modal-sm">
     <div class="modal-header">
-      <h2>Sign in to CodeVault</h2>
-      <button class="close-btn" onclick="closeModal('login-modal')">✕</button>
+      <div><h2>Sign In</h2></div>
+      <button class="close-btn" onclick="closeModal('login-modal')" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Username</label>
-        <input class="form-input" id="login-username" placeholder="your username" autocomplete="off">
+        <label class="form-label" for="login-username">Username</label>
+        <input class="form-input" id="login-username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
       </div>
       <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" type="password" id="login-password" placeholder="••••••••">
+        <label class="form-label" for="login-password">Password</label>
+        <input class="form-input" id="login-password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
-      <button class="btn btn-primary full-width" onclick="doLogin()" style="margin-top:0.5rem;">Sign In</button>
-      <div style="text-align:center;margin-top:1rem;font-size:0.82rem;color:var(--muted);font-family:'DM Mono',monospace;">
-        No account? <a href="#" onclick="closeModal('login-modal');showModal('register-modal')" style="color:var(--accent2);">Register free</a>
-      </div>
+      <div class="form-error" id="login-error"></div>
+      <button class="btn btn-primary full-width" style="margin-top:0.4rem;" onclick="doLogin()">Sign In</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--muted);font-family:'DM Mono',monospace;">
+        No account? <a href="#" onclick="return switchModals('login-modal','register-modal')" style="color:var(--accent2);">Create one free</a>
+      </p>
     </div>
   </div>
 </div>
 
 <!-- REGISTER -->
-<div class="modal-overlay" id="register-modal">
+<div class="modal-overlay" id="register-modal" role="dialog" aria-modal="true">
   <div class="modal modal-sm">
     <div class="modal-header">
-      <h2>Create Account</h2>
-      <button class="close-btn" onclick="closeModal('register-modal')">✕</button>
+      <div><h2>Create Account</h2></div>
+      <button class="close-btn" onclick="closeModal('register-modal')" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Display Name</label>
-        <input class="form-input" id="reg-name" placeholder="e.g. devmatt">
+        <label class="form-label" for="reg-name">Display Name</label>
+        <input class="form-input" id="reg-name" type="text" autocomplete="name">
       </div>
       <div class="form-group">
-        <label class="form-label">Username</label>
-        <input class="form-input" id="reg-username" placeholder="unique username">
+        <label class="form-label" for="reg-username">Username</label>
+        <input class="form-input" id="reg-username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+        <span class="form-hint">2–30 chars · lowercase, numbers, underscores</span>
       </div>
       <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" type="password" id="reg-password" placeholder="min 6 characters">
+        <label class="form-label" for="reg-password">Password</label>
+        <input class="form-input" id="reg-password" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+        <span class="form-hint">Minimum 8 characters</span>
       </div>
-      <button class="btn btn-primary full-width mt-sm" onclick="doRegister()">Create Account</button>
+      <div class="form-error" id="reg-error"></div>
+      <button class="btn btn-primary full-width" style="margin-top:0.4rem;" onclick="doRegister()">Create Account</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--muted);font-family:'DM Mono',monospace;">
+        Have an account? <a href="#" onclick="return switchModals('register-modal','login-modal')" style="color:var(--accent2);">Sign in</a>
+      </p>
     </div>
   </div>
 </div>
 
-<!-- SELL / UPLOAD -->
-<div class="modal-overlay" id="sell-modal">
+<!-- SELL -->
+<div class="modal-overlay" id="sell-modal" role="dialog" aria-modal="true">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <h2>List Code for Sale</h2>
-      <button class="close-btn" onclick="closeModal('sell-modal')">✕</button>
+      <div>
+        <h2>List Code for Sale</h2>
+        <div class="modal-subtitle">Your source code is stored privately and never shown to buyers until a transaction is completed.</div>
+      </div>
+      <button class="close-btn" onclick="closeModal('sell-modal')" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Title</label>
-        <input class="form-input" id="sell-title" placeholder="e.g. Lightweight Drag & Drop Library">
+        <label class="form-label" for="sell-title">Listing Title</label>
+        <input class="form-input" id="sell-title" type="text" maxlength="120">
       </div>
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-textarea" id="sell-desc" placeholder="What does your code do? What problem does it solve?"></textarea>
+        <label class="form-label" for="sell-desc">Description</label>
+        <textarea class="form-textarea" id="sell-desc" maxlength="600" rows="3"></textarea>
+        <span class="form-hint">What does your code do? What problem does it solve? Any dependencies?</span>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Language</label>
+          <label class="form-label" for="sell-lang">Language</label>
           <select class="form-select" id="sell-lang">
-            <option>JavaScript</option>
-            <option>TypeScript</option>
-            <option>Python</option>
-            <option>CSS</option>
-            <option>HTML</option>
-            <option>Other</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="TypeScript">TypeScript</option>
+            <option value="Python">Python</option>
+            <option value="CSS">CSS</option>
+            <option value="HTML">HTML</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Tags (comma separated)</label>
-          <input class="form-input" id="sell-tags" placeholder="e.g. utility, animation, react">
+          <label class="form-label" for="sell-tags">Tags</label>
+          <input class="form-input" id="sell-tags" type="text" maxlength="200">
+          <span class="form-hint">Comma-separated, e.g. utility, animation, react</span>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Full Purchase Price (USD)</label>
-          <input class="form-input" id="sell-price" type="number" min="1" placeholder="e.g. 49">
+          <label class="form-label" for="sell-price">Full Purchase Price (USD)</label>
+          <input class="form-input" id="sell-price" type="number" min="1" max="99999" step="1">
         </div>
         <div class="form-group">
-          <label class="form-label">License Price / mo (USD) <span style="color:var(--muted);font-size:0.75rem;font-weight:400;">optional</span></label>
-          <input class="form-input" id="sell-license" type="number" min="1" placeholder="e.g. 9">
+          <label class="form-label" for="sell-license">License Price / month (USD) <span style="color:var(--muted);font-weight:400;font-size:0.7rem;">optional</span></label>
+          <input class="form-input" id="sell-license" type="number" min="1" max="9999" step="1">
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Code</label>
-        <div class="code-drop-zone" id="drop-zone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
-          <input type="file" id="file-input" accept=".js,.ts,.py,.css,.html,.txt,.json,.jsx,.tsx,.vue,.rb,.go,.rs,.php,.java,.cs,.cpp,.c" onchange="handleFileSelect(event)">
+        <label class="form-label">Source Code</label>
+        <div class="code-drop-zone" id="drop-zone"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="handleFileDrop(event)">
+          <input type="file" id="file-input" accept=".js,.jsx,.ts,.tsx,.py,.css,.html,.txt,.json,.vue,.rb,.go,.rs,.php,.java,.cs,.cpp,.c,.sh,.kt,.swift" onchange="handleFileSelect(event)">
           <div class="drop-icon">↑</div>
-          <div class="drop-text">Drop a file here or <strong>click to browse</strong></div>
+          <div class="drop-text">Drop a file here or <strong>click to browse</strong><br>Supports .js .ts .py .css .html and more</div>
         </div>
-        <div class="code-editor-wrap" style="margin-top:0.6rem;">
+        <div class="code-editor-wrap">
           <div class="code-editor-header">
             <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-            <span class="code-filename" id="editor-filename">untitled</span>
+            <span class="code-filename" id="editor-filename">main</span>
           </div>
-          <textarea class="code-textarea" id="sell-code" placeholder="// Or paste your code here..."></textarea>
+          <textarea class="code-textarea" id="sell-code" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
         </div>
+        <span class="form-hint" style="margin-top:0.5rem;">Paste directly or upload a file. Only you and buyers who complete a transaction will ever see this.</span>
       </div>
-      <button class="btn btn-primary full-width mt-sm" onclick="doSellSubmit()">Publish Listing →</button>
+      <div class="form-error" id="sell-error"></div>
+      <button class="btn btn-primary full-width" style="margin-top:0.6rem;" onclick="doSellSubmit()">Publish Listing →</button>
     </div>
   </div>
 </div>
 
-<!-- LISTING DETAIL -->
-<div class="modal-overlay" id="detail-modal">
+<!-- DETAIL -->
+<div class="modal-overlay" id="detail-modal" role="dialog" aria-modal="true">
   <div class="modal modal-xl">
     <div class="modal-header">
       <div>
-        <h2 id="detail-title">Listing</h2>
-        <div style="font-size:0.73rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:0.2rem;" id="detail-meta-line"></div>
+        <h2 id="detail-title"></h2>
+        <div class="modal-subtitle" id="detail-meta-line"></div>
       </div>
-      <button class="close-btn" onclick="closeModal('detail-modal')">✕</button>
+      <button class="close-btn" onclick="closeModal('detail-modal')" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
       <div class="detail-grid">
+        <!-- LEFT -->
         <div>
-          <div class="detail-code-preview" id="detail-code-wrap">
+          <!-- Code box — blurred for everyone except the listing owner -->
+          <div class="code-preview-box blurred" id="detail-code-box">
             <div class="code-editor-header">
               <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-              <span class="code-filename" id="detail-lang-badge">preview</span>
-              <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">⚠ blurred for non-buyers</span>
+              <span class="code-filename" id="detail-code-filename"></span>
+              <span id="detail-view-note" style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);"></span>
             </div>
-            <pre id="detail-code-preview"></pre>
-          </div>
-          <div style="margin-top:1rem;">
-            <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;font-family:'DM Mono',monospace;" id="detail-desc"></p>
-          </div>
-          <div style="margin-top:1rem;" id="detail-tags-wrap">
-            <div class="tag-list" id="detail-tags"></div>
+            <pre id="detail-code-pre"></pre>
+            <div class="code-lock-overlay" id="detail-lock-overlay">
+              <div class="code-lock-icon">🔒</div>
+              <div class="code-lock-text">Source code is protected.<br>Make an offer to gain access once the seller accepts.</div>
+            </div>
           </div>
 
-          <!-- Offer form for buyers -->
-          <div id="offer-form-section" style="margin-top:1.5rem;display:none;">
+          <p style="margin-top:1rem;font-size:0.87rem;color:var(--muted);line-height:1.65;font-family:'DM Mono',monospace;" id="detail-desc"></p>
+          <div id="detail-tags"></div>
+
+          <!-- Offer form (signed-in buyer who is not the seller) -->
+          <div id="offer-section" style="display:none;">
             <div class="divider"></div>
             <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;">Make an Offer</h3>
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Offer Type</label>
+                <label class="form-label" for="offer-type">Offer Type</label>
                 <select class="form-select" id="offer-type">
-                  <option value="buy">Full Purchase</option>
-                  <option value="license">License (monthly)</option>
+                  <option value="buy">Full Purchase — own the source code</option>
+                  <option value="license">License — monthly usage rights</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Your Offer (USD)</label>
-                <input class="form-input" id="offer-amount" type="number" min="1" placeholder="e.g. 40">
+                <label class="form-label" for="offer-amount">Your Offer (USD)</label>
+                <input class="form-input" id="offer-amount" type="number" min="1" max="999999" step="1">
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Message (optional)</label>
-              <input class="form-input" id="offer-message" placeholder="Any context or questions...">
+              <label class="form-label" for="offer-message">Message to Seller <span style="color:var(--muted);font-weight:400;font-size:0.7rem;">optional</span></label>
+              <input class="form-input" id="offer-message" type="text" maxlength="280">
             </div>
-            <button class="btn btn-purple full-width" onclick="submitOffer()">Submit Offer →</button>
+            <div class="form-error" id="offer-error"></div>
+            <button class="btn btn-purple full-width" style="margin-top:0.4rem;" onclick="submitOffer()">Submit Offer →</button>
           </div>
 
-          <!-- Seller's offers view -->
-          <div id="seller-offers-section" style="margin-top:1.5rem;display:none;">
+          <!-- Seller: offers received on this listing -->
+          <div id="seller-offers-section" style="display:none;">
             <div class="divider"></div>
-            <div class="offers-section">
-              <h3>Offers Received</h3>
-              <div id="seller-offers-list"></div>
-            </div>
+            <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:0.8rem;">Offers Received</h3>
+            <div id="seller-offers-list"></div>
           </div>
 
-          <!-- Login prompt -->
-          <div id="login-prompt-section" style="margin-top:1.5rem;display:none;">
+          <!-- Not signed in -->
+          <div id="auth-prompt-section" style="display:none;">
             <div class="divider"></div>
             <div style="text-align:center;padding:1.5rem;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-size:1.5rem;margin-bottom:0.5rem;">🔒</div>
-              <div style="font-size:0.85rem;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:1rem;">Sign in to make offers on this listing</div>
-              <button class="btn btn-primary" onclick="closeModal('detail-modal');showModal('login-modal')">Sign In to Make Offer</button>
+              <div style="font-size:1.4rem;margin-bottom:0.7rem;">🔒</div>
+              <div style="font-size:0.82rem;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:1.1rem;line-height:1.65;">Create a free account to make offers and license code.</div>
+              <div style="display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="closeModal('detail-modal');showModal('register-modal')">Create Free Account</button>
+                <button class="btn btn-ghost"   onclick="closeModal('detail-modal');showModal('login-modal')">Sign In</button>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- RIGHT SIDEBAR -->
         <div class="detail-sidebar">
-          <!-- Buy price card -->
           <div class="price-card" id="price-buy-card">
             <div class="price-card-title">Full Purchase</div>
             <div class="price-amount" id="detail-buy-price" style="color:var(--accent);">—</div>
-            <div class="price-desc">One-time payment. You own the code. Includes all future updates.</div>
-            <button class="btn btn-primary full-width btn-sm" id="quick-buy-btn" onclick="quickAction('buy')">Buy Now</button>
+            <div class="price-desc">One-time payment. Full source code ownership including any future updates.</div>
+            <button class="btn btn-primary full-width btn-sm" onclick="prefillOffer('buy')">Buy Now</button>
           </div>
-
-          <!-- License price card -->
           <div class="price-card" id="price-license-card" style="display:none;">
-            <div class="price-card-title">License</div>
+            <div class="price-card-title">Monthly License</div>
             <div class="price-amount" id="detail-license-price" style="color:var(--accent2);">—</div>
-            <div class="price-desc">Monthly license. Use it in your projects. Cancel any time.</div>
-            <button class="btn btn-purple full-width btn-sm" onclick="quickAction('license')">License It</button>
+            <div class="price-desc">Use the code in your projects. Cancel any time.</div>
+            <button class="btn btn-purple full-width btn-sm" onclick="prefillOffer('license')">License It</button>
           </div>
-
-          <div class="seller-info">
+          <div class="seller-card">
             <div class="seller-avatar" id="detail-avatar"></div>
             <div>
               <div class="seller-name" id="detail-seller-name"></div>
-              <div class="seller-join">Seller · CodeVault</div>
+              <div class="seller-sub">Verified Seller</div>
             </div>
           </div>
-
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;">
+          <div class="info-card">
             <div class="info-row"><span class="label">Language</span><span class="value" id="detail-info-lang"></span></div>
             <div class="info-row"><span class="label">Listed</span><span class="value" id="detail-info-date"></span></div>
             <div class="info-row"><span class="label">Offers</span><span class="value" id="detail-info-offers">0</span></div>
@@ -1034,20 +553,23 @@
 </div>
 
 <!-- DASHBOARD -->
-<div class="modal-overlay" id="dashboard-modal">
+<div class="modal-overlay" id="dashboard-modal" role="dialog" aria-modal="true">
   <div class="modal modal-xl">
     <div class="modal-header">
-      <h2>My Dashboard</h2>
-      <button class="close-btn" onclick="closeModal('dashboard-modal')">✕</button>
+      <div>
+        <h2>My Dashboard</h2>
+        <div class="modal-subtitle" id="dashboard-subtitle"></div>
+      </div>
+      <button class="close-btn" onclick="closeModal('dashboard-modal')" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
       <div class="dashboard-tabs">
-        <button class="tab-btn active" onclick="switchTab('my-listings')">My Listings</button>
-        <button class="tab-btn" onclick="switchTab('my-offers')">Offers I Made</button>
+        <button class="tab-btn active" onclick="switchTab('my-listings',this)">My Listings</button>
+        <button class="tab-btn"        onclick="switchTab('my-offers',this)">Offers I Made</button>
       </div>
       <div class="tab-content active" id="tab-my-listings">
         <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
-          <button class="btn btn-primary" onclick="closeModal('dashboard-modal');showModal('sell-modal')">+ New Listing</button>
+          <button class="btn btn-primary" onclick="closeModal('dashboard-modal');openSellModal()">+ New Listing</button>
         </div>
         <div id="my-listings-list"></div>
       </div>
@@ -1059,323 +581,158 @@
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-// ============================================================
-// STATE
-// ============================================================
-let db = {
-  users: [],
-  listings: [],
-  offers: []
-};
+'use strict';
 
-let currentUser = null;
-let activeFilter = 'all';
-let activeSort = 'newest';
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let db = { users: [], listings: [], offers: [] };
+let currentUser      = null;
+let activeFilter     = 'all';
+let activeSort       = 'newest';
 let currentListingId = null;
 
-// ============================================================
+// ═══════════════════════════════════════
 // PERSISTENCE
-// ============================================================
+// ═══════════════════════════════════════
 function save() {
-  try { localStorage.setItem('codevault_db', JSON.stringify(db)); } catch(e) {}
+  try { localStorage.setItem('cv2_db', JSON.stringify(db)); } catch (_) {}
 }
 function load() {
   try {
-    const raw = localStorage.getItem('codevault_db');
-    if (raw) db = JSON.parse(raw);
-  } catch(e) {}
-  // Seed demo data if empty
-  if (db.listings.length === 0) seedDemo();
-}
-
-function seedDemo() {
-  const seller = { id: 'u1', name: 'devmatt', username: 'devmatt', password: 'demo', joined: Date.now() - 1000000 };
-  db.users.push(seller);
-
-  const demos = [
-    {
-      id: 'l1', sellerId: 'u1', title: 'Infinite Scroll Hook',
-      desc: 'A reusable React hook that adds infinite scroll to any list. Zero dependencies, TypeScript support, configurable threshold.',
-      lang: 'TypeScript', tags: ['react','hooks','scroll','typescript'],
-      buyPrice: 39, licensePrice: 8,
-      code: `import { useEffect, useRef, useState } from 'react';
-
-interface UseInfiniteScrollOptions {
-  threshold?: number;
-  rootMargin?: string;
-}
-
-export function useInfiniteScroll(
-  callback: () => void,
-  options: UseInfiniteScrollOptions = {}
-) {
-  const { threshold = 1.0, rootMargin = '0px' } = options;
-  const observer = useRef<IntersectionObserver | null>(null);
-  const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!sentinel) return;
-    observer.current = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) callback(); },
-      { threshold, rootMargin }
-    );
-    observer.current.observe(sentinel);
-    return () => observer.current?.disconnect();
-  }, [sentinel, callback, threshold, rootMargin]);
-
-  return { ref: setSentinel };
-}`,
-      listed: Date.now() - 500000
-    },
-    {
-      id: 'l2', sellerId: 'u1', title: 'Smooth Parallax Engine',
-      desc: 'Pure CSS + JS parallax that works on any element. Supports mobile, GPU-accelerated, no jank. Drop in 2 lines.',
-      lang: 'JavaScript', tags: ['animation','css','performance','scroll'],
-      buyPrice: 25, licensePrice: 5,
-      code: `class ParallaxEngine {
-  constructor(selector = '[data-parallax]', options = {}) {
-    this.elements = [];
-    this.options = { speed: 0.5, clamp: true, ...options };
-    this.raf = null;
-    this._init(selector);
-  }
-
-  _init(selector) {
-    document.querySelectorAll(selector).forEach(el => {
-      this.elements.push({
-        el,
-        speed: parseFloat(el.dataset.parallaxSpeed) || this.options.speed,
-        origin: el.getBoundingClientRect().top + window.scrollY
-      });
-    });
-    window.addEventListener('scroll', () => this._tick(), { passive: true });
-    this._tick();
-  }
-
-  _tick() {
-    if (this.raf) return;
-    this.raf = requestAnimationFrame(() => {
-      const scrollY = window.scrollY;
-      this.elements.forEach(({ el, speed, origin }) => {
-        const offset = (scrollY - origin) * speed;
-        el.style.transform = \`translateY(\${offset}px)\`;
-      });
-      this.raf = null;
-    });
-  }
-}
-
-// Usage: new ParallaxEngine('[data-parallax]', { speed: 0.3 });`,
-      listed: Date.now() - 200000
-    },
-    {
-      id: 'l3', sellerId: 'u1', title: 'CSS Grid Layout Builder',
-      desc: 'Generate complex responsive CSS grid layouts with one function. Supports named areas, auto-placement, and media queries.',
-      lang: 'CSS', tags: ['css','grid','responsive','layout'],
-      buyPrice: 15, licensePrice: null,
-      code: `/* =====================
-   Auto-Responsive Grid System
-   No JavaScript required
-   ===================== */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(var(--grid-min, 240px), 1fr)
-  );
-  gap: var(--grid-gap, 1.5rem);
-  container-type: inline-size;
-}
-
-/* Named layout areas */
-.layout-blog {
-  display: grid;
-  grid-template:
-    "header  header" auto
-    "sidebar main  " 1fr
-    "footer  footer" auto
-    / 260px  1fr;
-  gap: 1.5rem;
-  min-height: 100vh;
-}
-
-@container (max-width: 640px) {
-  .layout-blog {
-    grid-template:
-      "header"
-      "main"
-      "sidebar"
-      "footer";
-  }
-}`,
-      listed: Date.now() - 100000
-    },
-    {
-      id: 'l4', sellerId: 'u1', title: 'Python Data Pipeline CLI',
-      desc: 'Command-line ETL tool for CSV/JSON transforms. Chained transforms, validation, progress bars, configurable output formats.',
-      lang: 'Python', tags: ['cli','data','etl','python'],
-      buyPrice: 79, licensePrice: 15,
-      code: `#!/usr/bin/env python3
-"""DataPipe — lightweight ETL for CSV/JSON"""
-
-import csv, json, argparse, sys
-from typing import Generator, Callable
-from pathlib import Path
-
-class Pipeline:
-    def __init__(self, source: str):
-        self.source = Path(source)
-        self._transforms: list[Callable] = []
-
-    def transform(self, fn: Callable) -> 'Pipeline':
-        self._transforms.append(fn)
-        return self
-
-    def _read(self) -> Generator:
-        suffix = self.source.suffix.lower()
-        if suffix == '.csv':
-            with open(self.source) as f:
-                yield from csv.DictReader(f)
-        elif suffix == '.json':
-            with open(self.source) as f:
-                data = json.load(f)
-                yield from (data if isinstance(data, list) else [data])
-        else:
-            raise ValueError(f"Unsupported format: {suffix}")
-
-    def run(self, output: str = None) -> list:
-        results = []
-        for row in self._read():
-            for fn in self._transforms:
-                row = fn(row)
-                if row is None:
-                    break
-            if row is not None:
-                results.append(row)
-        if output:
-            with open(output, 'w') as f:
-                json.dump(results, f, indent=2)
-        return results`,
-      listed: Date.now() - 50000
+    const raw = localStorage.getItem('cv2_db');
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && Array.isArray(p.users) && Array.isArray(p.listings) && Array.isArray(p.offers)) {
+        db = p;
+      }
     }
-  ];
-
-  demos.forEach(l => db.listings.push(l));
-  save();
+  } catch (_) {}
 }
 
-// ============================================================
+// ═══════════════════════════════════════
 // AUTH
-// ============================================================
+// ═══════════════════════════════════════
 function doLogin() {
-  const u = document.getElementById('login-username').value.trim();
-  const p = document.getElementById('login-password').value;
-  const user = db.users.find(x => x.username === u && x.password === p);
-  if (!user) { toast('❌ Invalid username or password'); return; }
+  const username = g('login-username').value.trim().toLowerCase();
+  const password = g('login-password').value;
+  showErr('login-error', '');
+  if (!username || !password) { showErr('login-error', 'Enter your username and password.'); return; }
+  const user = db.users.find(u => u.username === username && u.password === password);
+  if (!user) { showErr('login-error', 'Incorrect username or password.'); return; }
   currentUser = user;
+  g('login-username').value = '';
+  g('login-password').value = '';
   closeModal('login-modal');
   updateNav();
   renderListings();
-  toast('✓ Signed in as ' + user.name);
+  toast('Signed in as ' + user.name, 'success');
 }
 
 function doRegister() {
-  const name = document.getElementById('reg-name').value.trim();
-  const username = document.getElementById('reg-username').value.trim();
-  const pass = document.getElementById('reg-password').value;
-  if (!name || !username || !pass) { toast('❌ All fields required'); return; }
-  if (pass.length < 6) { toast('❌ Password must be 6+ characters'); return; }
-  if (db.users.find(x => x.username === username)) { toast('❌ Username already taken'); return; }
-  const user = { id: 'u' + Date.now(), name, username, password: pass, joined: Date.now() };
+  const name     = g('reg-name').value.trim();
+  const username = g('reg-username').value.trim().toLowerCase();
+  const password = g('reg-password').value;
+  showErr('reg-error', '');
+  if (!name)     { showErr('reg-error', 'Display name is required.'); return; }
+  if (!username) { showErr('reg-error', 'Username is required.'); return; }
+  if (!/^[a-z0-9_]{2,30}$/.test(username)) { showErr('reg-error', 'Username must be 2–30 chars: lowercase letters, numbers, underscores only.'); return; }
+  if (password.length < 8) { showErr('reg-error', 'Password must be at least 8 characters.'); return; }
+  if (db.users.find(u => u.username === username)) { showErr('reg-error', 'That username is already taken.'); return; }
+  const user = { id: uid(), name, username, password, joined: Date.now() };
   db.users.push(user);
   save();
   currentUser = user;
+  g('reg-name').value = g('reg-username').value = g('reg-password').value = '';
   closeModal('register-modal');
   updateNav();
-  toast('✓ Account created! Welcome, ' + name);
+  renderListings();
+  toast('Welcome to CodeVault, ' + name + '!', 'success');
 }
 
 function doLogout() {
   currentUser = null;
   updateNav();
   renderListings();
-  toast('Signed out');
+  toast('Signed out.');
 }
 
 function updateNav() {
-  const el = document.getElementById('nav-actions');
-  const sellBtn = document.getElementById('sell-btn');
+  const el = g('nav-actions');
+  const sb = g('sell-btn');
   if (currentUser) {
     el.innerHTML = `
-      <div class="user-badge" onclick="showDashboard()">
-        <div class="user-dot"></div>
-        ${currentUser.name}
+      <div class="user-badge" onclick="showDashboard()" title="My dashboard">
+        <div class="user-dot"></div>${x(currentUser.name)}
       </div>
-      <button class="btn btn-primary" onclick="showModal('sell-modal')">+ Sell Code</button>
-      <button class="btn btn-ghost" onclick="doLogout()">Sign Out</button>
-    `;
+      <button class="btn btn-primary" onclick="openSellModal()">+ Sell Code</button>
+      <button class="btn btn-ghost"   onclick="doLogout()">Sign Out</button>`;
+    if (sb) sb.style.display = '';
   } else {
     el.innerHTML = `
-      <button class="btn btn-ghost" onclick="showModal('login-modal')">Sign In</button>
-      <button class="btn btn-primary" onclick="showModal('register-modal')">Join Free</button>
-    `;
+      <button class="btn btn-ghost"   onclick="showModal('login-modal')">Sign In</button>
+      <button class="btn btn-primary" onclick="showModal('register-modal')">Join Free</button>`;
+    if (sb) sb.style.display = 'none';
   }
 }
 
-// ============================================================
+// ═══════════════════════════════════════
 // SELL / UPLOAD
-// ============================================================
+// ═══════════════════════════════════════
+const EXT_LANG = { js:'JavaScript', jsx:'JavaScript', ts:'TypeScript', tsx:'TypeScript', py:'Python', css:'CSS', html:'HTML', htm:'HTML' };
+
+function openSellModal() {
+  if (!currentUser) { showModal('login-modal'); return; }
+  showModal('sell-modal');
+}
 function handleFileDrop(e) {
   e.preventDefault();
-  document.getElementById('drop-zone').classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) readFile(file);
+  g('drop-zone').classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f) readFile(f);
 }
 function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) readFile(file);
+  const f = e.target.files[0];
+  if (f) readFile(f);
+  e.target.value = '';
 }
 function readFile(file) {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    document.getElementById('sell-code').value = ev.target.result;
-    document.getElementById('editor-filename').textContent = file.name;
-    // auto-detect language
-    const ext = file.name.split('.').pop().toLowerCase();
-    const map = { js:'JavaScript', jsx:'JavaScript', ts:'TypeScript', tsx:'TypeScript', py:'Python', css:'CSS', html:'HTML' };
-    const sel = document.getElementById('sell-lang');
-    sel.value = map[ext] || 'Other';
+  const ext = file.name.split('.').pop().toLowerCase();
+  const r = new FileReader();
+  r.onload = ev => {
+    g('sell-code').value = ev.target.result;
+    g('editor-filename').textContent = file.name;
+    if (EXT_LANG[ext]) g('sell-lang').value = EXT_LANG[ext];
   };
-  reader.readAsText(file);
+  r.readAsText(file);
 }
 
 function doSellSubmit() {
-  if (!currentUser) { toast('❌ Sign in first'); return; }
-  const title = document.getElementById('sell-title').value.trim();
-  const desc = document.getElementById('sell-desc').value.trim();
-  const lang = document.getElementById('sell-lang').value;
-  const tagsRaw = document.getElementById('sell-tags').value;
-  const buyPrice = parseFloat(document.getElementById('sell-price').value);
-  const licenseRaw = document.getElementById('sell-license').value;
-  const code = document.getElementById('sell-code').value.trim();
+  if (!currentUser) return;
+  const title    = g('sell-title').value.trim();
+  const desc     = g('sell-desc').value.trim();
+  const lang     = g('sell-lang').value;
+  const tagsRaw  = g('sell-tags').value;
+  const priceRaw = g('sell-price').value;
+  const licRaw   = g('sell-license').value;
+  const code     = g('sell-code').value.trim();
+  showErr('sell-error', '');
 
-  if (!title) { toast('❌ Title required'); return; }
-  if (!desc) { toast('❌ Description required'); return; }
-  if (!code) { toast('❌ Paste or upload your code'); return; }
-  if (!buyPrice || buyPrice < 1) { toast('❌ Set a purchase price'); return; }
+  if (!title)           { showErr('sell-error', 'A listing title is required.'); return; }
+  if (!desc)            { showErr('sell-error', 'A description is required.'); return; }
+  if (!code || code.length < 20) { showErr('sell-error', 'Paste your source code (minimum 20 characters).'); return; }
+  const buyPrice = parseFloat(priceRaw);
+  if (!priceRaw || isNaN(buyPrice) || buyPrice < 1) { showErr('sell-error', 'Enter a valid purchase price (min $1).'); return; }
+  const licPrice = licRaw ? parseFloat(licRaw) : null;
+  if (licRaw && (isNaN(licPrice) || licPrice < 1)) { showErr('sell-error', 'License price must be at least $1, or leave it blank.'); return; }
 
   const listing = {
-    id: 'l' + Date.now(),
-    sellerId: currentUser.id,
-    title, desc, lang,
-    tags: tagsRaw.split(',').map(t => t.trim()).filter(Boolean),
-    buyPrice,
-    licensePrice: licenseRaw ? parseFloat(licenseRaw) : null,
-    code,
+    id: uid(), sellerId: currentUser.id, title, desc, lang,
+    tags: tagsRaw.split(',').map(t => t.trim()).filter(Boolean).slice(0, 10),
+    buyPrice, licensePrice: licPrice, code,
     listed: Date.now()
   };
   db.listings.push(listing);
@@ -1384,77 +741,86 @@ function doSellSubmit() {
   clearSellForm();
   renderListings();
   updateStats();
-  toast('✓ Listing published!');
+  toast('Listing published!', 'success');
 }
 
 function clearSellForm() {
-  ['sell-title','sell-desc','sell-tags','sell-price','sell-license','sell-code'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('editor-filename').textContent = 'untitled';
+  ['sell-title','sell-desc','sell-tags','sell-price','sell-license','sell-code'].forEach(id => { g(id).value = ''; });
+  g('editor-filename').textContent = 'main';
+  showErr('sell-error', '');
 }
 
-// ============================================================
+// ═══════════════════════════════════════
 // LISTINGS RENDER
-// ============================================================
+// ═══════════════════════════════════════
 function setFilter(f) {
   activeFilter = f;
-  document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === f));
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
   renderListings();
 }
-
-function setSort(s) {
+function setSort(s, btn) {
   activeSort = s;
-  document.querySelectorAll('[id^="sort-"]').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('sort-' + s)?.classList.add('active');
+  document.querySelectorAll('.sidebar .filter-btn:not([data-filter])').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
   renderListings();
-}
-
-function getLangClass(lang) {
-  const map = { JavaScript:'lang-js', Python:'lang-py', TypeScript:'lang-ts', CSS:'lang-css', HTML:'lang-html' };
-  return map[lang] || 'lang-other';
 }
 
 function renderListings() {
-  const grid = document.getElementById('listings-grid');
-  const search = document.getElementById('search-input').value.toLowerCase();
+  const grid   = g('listings-grid');
+  const search = g('search-input').value.toLowerCase().trim();
   let items = [...db.listings];
-
   if (activeFilter !== 'all') items = items.filter(l => l.lang === activeFilter);
   if (search) items = items.filter(l =>
     l.title.toLowerCase().includes(search) ||
     l.desc.toLowerCase().includes(search) ||
+    l.lang.toLowerCase().includes(search) ||
     (l.tags || []).some(t => t.toLowerCase().includes(search))
   );
-
-  if (activeSort === 'newest') items.sort((a,b) => b.listed - a.listed);
-  else if (activeSort === 'price-low') items.sort((a,b) => a.buyPrice - b.buyPrice);
+  if (activeSort === 'newest')     items.sort((a,b) => b.listed - a.listed);
+  else if (activeSort === 'price-low')  items.sort((a,b) => a.buyPrice - b.buyPrice);
   else if (activeSort === 'price-high') items.sort((a,b) => b.buyPrice - a.buyPrice);
 
   if (items.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">⬡</div><p>No listings found.<br>${currentUser ? 'Be the first to list code!' : 'Sign up and list your code.'}</p></div>`;
+    if (db.listings.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">⬡</div>
+          <h3>No listings yet</h3>
+          <p>${currentUser
+            ? 'Click <strong style="color:var(--accent);">+ Sell Code</strong> to publish your first listing.'
+            : 'Create a free account and be the first to list code on CodeVault.'}</p>
+        </div>`;
+    } else {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">⌕</div>
+          <h3>No results found</h3>
+          <p>No listings match your current filters.<br>Try adjusting your search or language filter.</p>
+        </div>`;
+    }
     return;
   }
 
   grid.innerHTML = items.map(l => {
     const seller = db.users.find(u => u.id === l.sellerId);
-    const preview = blurCode(l.code.slice(0, 400));
-    const offerCount = db.offers.filter(o => o.listingId === l.id).length;
+    // NEVER show real code in card previews — always show synthetic locked preview
+    const fakePeek = syntheticPreview(l.lang);
     return `
-    <div class="listing-card" onclick="openDetail('${l.id}')">
+    <div class="listing-card" onclick="openDetail('${x(l.id)}')" tabindex="0" role="button" aria-label="View: ${x(l.title)}">
       <div class="card-preview">
-        <span class="lang-badge ${getLangClass(l.lang)}">${l.lang}</span>
-        <pre>${escapeHtml(preview)}</pre>
+        <span class="lang-badge ${langClass(l.lang)}">${x(l.lang)}</span>
+        <pre>${x(fakePeek)}</pre>
         <div class="card-preview-blur"></div>
+        <div class="card-preview-lock">🔒</div>
       </div>
       <div class="card-body">
-        <div class="card-title">${escapeHtml(l.title)}</div>
-        <div class="card-desc">${escapeHtml(l.desc.slice(0, 90))}${l.desc.length > 90 ? '…' : ''}</div>
+        <div class="card-title">${x(l.title)}</div>
+        <div class="card-desc">${x(l.desc.length > 100 ? l.desc.slice(0,97) + '…' : l.desc)}</div>
         <div class="card-meta">
-          <div class="card-seller">by <strong>${seller?.name || 'unknown'}</strong></div>
+          <div class="card-seller">by <strong>${x(seller?.name ?? 'unknown')}</strong></div>
           <div class="card-prices">
-            <div class="price-buy">$${l.buyPrice}</div>
-            ${l.licensePrice ? `<div class="price-license">$${l.licensePrice}/mo license</div>` : ''}
+            <div class="price-buy">$${l.buyPrice.toLocaleString()}</div>
+            ${l.licensePrice ? `<div class="price-license">$${l.licensePrice}/mo</div>` : ''}
           </div>
         </div>
       </div>
@@ -1462,283 +828,339 @@ function renderListings() {
   }).join('');
 }
 
-function blurCode(code) {
-  // Show first 3 lines clearly, blur rest with hashes
-  const lines = code.split('\n');
-  return lines.slice(0, 3).join('\n') + '\n' + lines.slice(3).map(() => '█'.repeat(Math.floor(Math.random()*30+10))).join('\n');
+// Synthetic code previews — plausible-looking but NOT the real source
+// Real code is NEVER placed in the DOM for non-owners
+const PREVIEWS = {
+  JavaScript: [
+    `function setup(opts) {\n  const ctx = init(opts);\n  return ctx.run();\n}`,
+    `export default async (req, res) => {\n  const data = await load(req);\n  res.json(data);\n}`
+  ],
+  TypeScript: [
+    `interface Options<T> {\n  value: T;\n  validate(v: T): boolean;\n}`,
+    `type Result<T, E =\n  | { ok: true; data: T }\n  | { ok: false; err: E };`
+  ],
+  Python: [
+    `def process(items: list) -> dict:\n    return {i.id: i for i in items}`,
+    `@dataclass\nclass Config:\n    host: str\n    port: int = 8080`
+  ],
+  CSS: [
+    `.grid {\n  display: grid;\n  grid-template-columns:\n    repeat(auto-fill, minmax(240px, 1fr));\n}`,
+    `@keyframes fade {\n  from { opacity: 0; }\n  to   { opacity: 1; }\n}`
+  ],
+  HTML: [
+    `<section aria-label="hero">\n  <h1>...</h1>\n  <p>...</p>\n</section>`,
+    `<template id="card">\n  <article class="card">\n    <slot></slot>\n  </article>\n</template>`
+  ],
+  Other: [
+    `// Source protected\n// Make an offer to\n// unlock full access`,
+    `# Protected source\n# Offer required to\n# view full code`
+  ]
+};
+function syntheticPreview(lang) {
+  const opts = PREVIEWS[lang] || PREVIEWS['Other'];
+  return opts[Math.floor(Math.random() * opts.length)];
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ============================================================
+// ═══════════════════════════════════════
 // DETAIL MODAL
-// ============================================================
+// ═══════════════════════════════════════
 function openDetail(listingId) {
   currentListingId = listingId;
-  const l = db.listings.find(x => x.id === listingId);
+  const l = db.listings.find(z => z.id === listingId);
   if (!l) return;
-  const seller = db.users.find(u => u.id === l.sellerId);
+  const seller     = db.users.find(u => u.id === l.sellerId);
+  const isSeller   = !!(currentUser && currentUser.id === l.sellerId);
   const offerCount = db.offers.filter(o => o.listingId === listingId).length;
-  const isSeller = currentUser && currentUser.id === l.sellerId;
 
-  document.getElementById('detail-title').textContent = l.title;
-  document.getElementById('detail-meta-line').textContent = l.lang + ' · listed ' + timeAgo(l.listed);
-  document.getElementById('detail-lang-badge').textContent = l.lang;
-  document.getElementById('detail-desc').textContent = l.desc;
-  document.getElementById('detail-avatar').textContent = (seller?.name || '?')[0].toUpperCase();
-  document.getElementById('detail-seller-name').textContent = seller?.name || 'Unknown';
-  document.getElementById('detail-info-lang').textContent = l.lang;
-  document.getElementById('detail-info-date').textContent = timeAgo(l.listed);
-  document.getElementById('detail-info-offers').textContent = offerCount;
+  g('detail-title').textContent         = l.title;
+  g('detail-meta-line').textContent     = l.lang + ' · listed ' + timeAgo(l.listed);
+  g('detail-code-filename').textContent = l.lang.toLowerCase();
+  g('detail-desc').textContent          = l.desc;
+  g('detail-avatar').textContent        = (seller?.name ?? '?')[0].toUpperCase();
+  g('detail-seller-name').textContent   = seller?.name ?? 'Unknown';
+  g('detail-info-lang').textContent     = l.lang;
+  g('detail-info-date').textContent     = timeAgo(l.listed);
+  g('detail-info-offers').textContent   = offerCount;
+  g('detail-buy-price').textContent     = '$' + l.buyPrice.toLocaleString();
 
-  // Prices
-  document.getElementById('detail-buy-price').textContent = '$' + l.buyPrice;
-  const licCard = document.getElementById('price-license-card');
+  const licCard = g('price-license-card');
   if (l.licensePrice) {
     licCard.style.display = '';
-    document.getElementById('detail-license-price').textContent = '$' + l.licensePrice + '/mo';
+    g('detail-license-price').textContent = '$' + l.licensePrice + '/mo';
   } else {
     licCard.style.display = 'none';
   }
 
-  // Tags
-  const tagsEl = document.getElementById('detail-tags');
-  tagsEl.innerHTML = (l.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  g('detail-tags').innerHTML = l.tags?.length
+    ? `<div class="tag-list">${l.tags.map(t => `<span class="tag">${x(t)}</span>`).join('')}</div>`
+    : '';
 
-  // Code preview — show more lines but obfuscate middle
-  const lines = l.code.split('\n');
-  const preview = isSeller
-    ? l.code // seller sees full code
-    : lines.slice(0,6).join('\n') + '\n\n' + '// ⚠️  Full source available after purchase\n\n' + lines.slice(-3).join('\n');
-  document.getElementById('detail-code-preview').textContent = preview;
+  // ── CODE DISPLAY RULE ──
+  // The seller (owner) sees their own real code clearly.
+  // EVERYONE else — including signed-in users and buyers with accepted offers —
+  // sees only a synthetic preview with a lock overlay.
+  // Real source code NEVER enters the DOM for non-owners.
+  const box      = g('detail-code-box');
+  const pre      = g('detail-code-pre');
+  const overlay  = g('detail-lock-overlay');
+  const viewNote = g('detail-view-note');
 
-  // Show/hide action sections
-  document.getElementById('offer-form-section').style.display = (!currentUser || isSeller) ? 'none' : '';
-  document.getElementById('login-prompt-section').style.display = (!currentUser) ? '' : 'none';
-  document.getElementById('seller-offers-section').style.display = isSeller ? '' : 'none';
+  if (isSeller) {
+    pre.textContent = l.code;
+    box.classList.remove('blurred');
+    box.classList.add('owner-view');
+    overlay.style.display = 'none';
+    viewNote.textContent  = 'Your listing — full source';
+  } else {
+    // Synthetic preview only — real code never in DOM
+    pre.textContent = syntheticPreview(l.lang);
+    box.classList.add('blurred');
+    box.classList.remove('owner-view');
+    overlay.style.display = 'flex';
+    viewNote.textContent  = 'Protected';
+  }
+
+  // Panels
+  g('offer-section').style.display          = (currentUser && !isSeller) ? '' : 'none';
+  g('seller-offers-section').style.display  = isSeller ? '' : 'none';
+  g('auth-prompt-section').style.display    = !currentUser ? '' : 'none';
+
+  showErr('offer-error', '');
+  g('offer-amount').value  = '';
+  g('offer-message').value = '';
 
   if (isSeller) renderSellerOffers(listingId);
-
   showModal('detail-modal');
 }
 
 function renderSellerOffers(listingId) {
   const offers = db.offers.filter(o => o.listingId === listingId);
-  const el = document.getElementById('seller-offers-list');
+  const el     = g('seller-offers-list');
   if (offers.length === 0) {
-    el.innerHTML = '<div style="color:var(--muted);font-family:\'DM Mono\',monospace;font-size:0.82rem;text-align:center;padding:1.5rem;">No offers yet</div>';
+    el.innerHTML = '<div style="color:var(--muted);font-family:\'DM Mono\',monospace;font-size:0.82rem;text-align:center;padding:1.5rem 0;">No offers received yet.</div>';
     return;
   }
   el.innerHTML = offers.map(o => {
     const buyer = db.users.find(u => u.id === o.buyerId);
-    const badgeClass = o.status === 'accepted' ? 'badge-accepted' : o.status === 'declined' ? 'badge-declined' : 'badge-pending';
+    const bc    = o.status === 'accepted' ? 'badge-accepted' : o.status === 'declined' ? 'badge-declined' : 'badge-pending';
     return `
     <div class="offer-item">
       <div class="offer-info">
-        <div class="offer-buyer">${buyer?.name || 'Unknown'}</div>
-        <span class="offer-type ${o.type === 'buy' ? 'offer-type-buy' : 'offer-type-license'}">${o.type === 'buy' ? 'Full Purchase' : 'License'}</span>
-        ${o.message ? `<div style="font-size:0.72rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:0.3rem;">"${escapeHtml(o.message)}"</div>` : ''}
-        ${o.status === 'pending' ? `<div class="offer-actions">
-          <button class="btn btn-primary btn-sm" onclick="respondOffer('${o.id}','accepted')">Accept</button>
-          <button class="btn btn-danger btn-sm" onclick="respondOffer('${o.id}','declined')">Decline</button>
-        </div>` : `<span class="offer-status-badge ${badgeClass}" style="margin-top:0.4rem;display:inline-block;">${o.status}</span>`}
+        <div class="offer-buyer">${x(buyer?.name ?? 'Unknown')}</div>
+        <span class="offer-type ${o.type === 'buy' ? 'offer-type-buy' : 'offer-type-license'}">${o.type === 'buy' ? 'Full Purchase' : 'Monthly License'}</span>
+        ${o.message ? `<div class="offer-message">"${x(o.message)}"</div>` : ''}
+        ${o.status === 'pending'
+          ? `<div class="offer-actions" style="margin-top:0.4rem;">
+               <button class="btn btn-primary btn-sm" onclick="respondOffer('${x(o.id)}','accepted')">Accept</button>
+               <button class="btn btn-danger btn-sm"  onclick="respondOffer('${x(o.id)}','declined')">Decline</button>
+             </div>`
+          : `<span class="badge ${bc}" style="margin-top:0.3rem;">${o.status}</span>`}
       </div>
-      <div class="offer-amount">$${o.amount}</div>
+      <div class="offer-right">
+        <div class="offer-amount">$${o.amount.toLocaleString()}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">${timeAgo(o.created)}</div>
+      </div>
     </div>`;
   }).join('');
 }
 
 function respondOffer(offerId, status) {
-  const o = db.offers.find(x => x.id === offerId);
-  if (o) { o.status = status; save(); }
+  const o = db.offers.find(z => z.id === offerId);
+  if (!o || o.status !== 'pending') return;
+  o.status = status;
+  save();
   renderSellerOffers(currentListingId);
   updateStats();
-  toast(status === 'accepted' ? '✓ Offer accepted!' : 'Offer declined');
+  g('detail-info-offers').textContent = db.offers.filter(o => o.listingId === currentListingId).length;
+  toast(status === 'accepted' ? 'Offer accepted!' : 'Offer declined.', status === 'accepted' ? 'success' : '');
+}
+
+function prefillOffer(type) {
+  if (!currentUser) { closeModal('detail-modal'); showModal('login-modal'); return; }
+  const l = db.listings.find(z => z.id === currentListingId);
+  if (!l || currentUser.id === l.sellerId) return;
+  g('offer-type').value   = type;
+  g('offer-amount').value = type === 'buy' ? l.buyPrice : (l.licensePrice ?? '');
+  g('offer-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function submitOffer() {
-  if (!currentUser) { toast('❌ Sign in first'); return; }
-  const l = db.listings.find(x => x.id === currentListingId);
+  if (!currentUser) return;
+  const l = db.listings.find(z => z.id === currentListingId);
   if (!l) return;
-  if (currentUser.id === l.sellerId) { toast("❌ Can't offer on your own listing"); return; }
-  const type = document.getElementById('offer-type').value;
-  const amount = parseFloat(document.getElementById('offer-amount').value);
-  const message = document.getElementById('offer-message').value.trim();
-  if (!amount || amount < 1) { toast('❌ Enter a valid offer amount'); return; }
-
-  // Check for existing pending offer
-  const existing = db.offers.find(o => o.listingId === currentListingId && o.buyerId === currentUser.id && o.type === type && o.status === 'pending');
-  if (existing) { toast('❌ You already have a pending offer of this type'); return; }
-
-  const offer = {
-    id: 'o' + Date.now(),
-    listingId: currentListingId,
-    buyerId: currentUser.id,
-    type, amount, message,
-    status: 'pending',
-    created: Date.now()
-  };
-  db.offers.push(offer);
+  showErr('offer-error', '');
+  if (currentUser.id === l.sellerId) { showErr('offer-error', 'You cannot make an offer on your own listing.'); return; }
+  const type   = g('offer-type').value;
+  const amtRaw = g('offer-amount').value;
+  const msg    = g('offer-message').value.trim();
+  const amount = parseFloat(amtRaw);
+  if (!amtRaw || isNaN(amount) || amount < 1) { showErr('offer-error', 'Enter a valid offer amount (min $1).'); return; }
+  if (type === 'license' && !l.licensePrice)  { showErr('offer-error', 'This listing does not offer a license option.'); return; }
+  const existing = db.offers.find(o =>
+    o.listingId === currentListingId && o.buyerId === currentUser.id &&
+    o.type === type && o.status === 'pending'
+  );
+  if (existing) { showErr('offer-error', 'You already have a pending offer of this type. Wait for the seller to respond.'); return; }
+  db.offers.push({ id: uid(), listingId: currentListingId, buyerId: currentUser.id, type, amount, message: msg, status: 'pending', created: Date.now() });
   save();
-  document.getElementById('offer-amount').value = '';
-  document.getElementById('offer-message').value = '';
+  g('offer-amount').value  = '';
+  g('offer-message').value = '';
   updateStats();
-  toast('✓ Offer submitted! The seller will be notified.');
-  // Update offer count
-  document.getElementById('detail-info-offers').textContent = db.offers.filter(o => o.listingId === currentListingId).length;
+  g('detail-info-offers').textContent = db.offers.filter(o => o.listingId === currentListingId).length;
+  toast('Offer submitted — the seller will be notified.', 'success');
 }
 
-function quickAction(type) {
-  if (!currentUser) { closeModal('detail-modal'); showModal('login-modal'); return; }
-  const l = db.listings.find(x => x.id === currentListingId);
-  if (!l) return;
-  if (currentUser.id === l.sellerId) { toast("That's your listing!"); return; }
-  // Pre-fill offer form
-  document.getElementById('offer-type').value = type;
-  document.getElementById('offer-amount').value = type === 'buy' ? l.buyPrice : (l.licensePrice || '');
-  document.getElementById('offer-form-section').scrollIntoView({ behavior: 'smooth' });
-  toast('Offer form pre-filled — submit to proceed!');
-}
-
-// ============================================================
+// ═══════════════════════════════════════
 // DASHBOARD
-// ============================================================
+// ═══════════════════════════════════════
 function showDashboard() {
+  if (!currentUser) return;
+  g('dashboard-subtitle').textContent = 'Signed in as ' + currentUser.name;
   renderMyListings();
   renderMyOffers();
   showModal('dashboard-modal');
 }
-
-function switchTab(tab) {
+function switchTab(tabId, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  g('tab-' + tabId).classList.add('active');
+  if (btn) btn.classList.add('active');
 }
-
 function renderMyListings() {
   if (!currentUser) return;
-  const myListings = db.listings.filter(l => l.sellerId === currentUser.id);
-  const el = document.getElementById('my-listings-list');
-  if (myListings.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-family:\'DM Mono\',monospace;">No listings yet. Create your first one!</div>';
+  const mine = db.listings.filter(l => l.sellerId === currentUser.id);
+  const el   = g('my-listings-list');
+  if (mine.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:0.82rem;">You have no listings yet. Create your first one above.</div>';
     return;
   }
-  el.innerHTML = myListings.map(l => {
-    const offers = db.offers.filter(o => o.listingId === l.id);
+  el.innerHTML = mine.map(l => {
+    const offers  = db.offers.filter(o => o.listingId === l.id);
     const pending = offers.filter(o => o.status === 'pending').length;
     return `
     <div class="listing-row">
-      <span class="lang-badge ${getLangClass(l.lang)}" style="position:static;">${l.lang}</span>
+      <span class="lang-badge ${langClass(l.lang)}" style="position:static;">${x(l.lang)}</span>
       <div class="listing-row-info">
-        <div class="listing-row-title">${escapeHtml(l.title)}</div>
-        <div class="listing-row-meta">${offers.length} offers total · ${pending} pending · Listed ${timeAgo(l.listed)}</div>
+        <div class="listing-row-title">${x(l.title)}</div>
+        <div class="listing-row-meta">${offers.length} offer${offers.length !== 1 ? 's' : ''} · ${pending} pending · ${timeAgo(l.listed)}</div>
       </div>
-      <div class="listing-row-price">$${l.buyPrice}</div>
+      <div class="listing-row-price">$${l.buyPrice.toLocaleString()}</div>
       <div class="listing-row-actions">
-        <button class="btn btn-ghost btn-sm" onclick="closeModal('dashboard-modal');openDetail('${l.id}')">View</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteListing('${l.id}')">Delete</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('dashboard-modal');openDetail('${x(l.id)}')">View</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteListing('${x(l.id)}')">Delete</button>
       </div>
     </div>`;
   }).join('');
 }
-
 function deleteListing(listingId) {
-  if (!confirm('Delete this listing? This cannot be undone.')) return;
+  if (!confirm('Permanently delete this listing and all its offers? This cannot be undone.')) return;
   db.listings = db.listings.filter(l => l.id !== listingId);
-  db.offers = db.offers.filter(o => o.listingId !== listingId);
+  db.offers   = db.offers.filter(o => o.listingId !== listingId);
   save();
   renderMyListings();
   renderListings();
   updateStats();
-  toast('Listing deleted');
+  toast('Listing deleted.');
 }
-
 function renderMyOffers() {
   if (!currentUser) return;
-  const myOffers = db.offers.filter(o => o.buyerId === currentUser.id);
-  const el = document.getElementById('my-offers-list');
-  if (myOffers.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-family:\'DM Mono\',monospace;">You haven\'t made any offers yet.</div>';
+  const mine = db.offers.filter(o => o.buyerId === currentUser.id);
+  const el   = g('my-offers-list');
+  if (mine.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:0.82rem;">You have not made any offers yet.</div>';
     return;
   }
-  el.innerHTML = myOffers.map(o => {
-    const l = db.listings.find(x => x.id === o.listingId);
+  el.innerHTML = mine.map(o => {
+    const l      = db.listings.find(z => z.id === o.listingId);
     const seller = l ? db.users.find(u => u.id === l.sellerId) : null;
-    const badgeClass = o.status === 'accepted' ? 'badge-accepted' : o.status === 'declined' ? 'badge-declined' : 'badge-pending';
+    const bc     = o.status === 'accepted' ? 'badge-accepted' : o.status === 'declined' ? 'badge-declined' : 'badge-pending';
     return `
     <div class="listing-row">
       <div class="listing-row-info">
-        <div class="listing-row-title">${l ? escapeHtml(l.title) : '[Deleted listing]'}</div>
-        <div class="listing-row-meta">Seller: ${seller?.name || 'unknown'} · Type: ${o.type} · Submitted ${timeAgo(o.created)}</div>
+        <div class="listing-row-title">${l ? x(l.title) : '[Deleted listing]'}</div>
+        <div class="listing-row-meta">Seller: ${x(seller?.name ?? 'unknown')} · ${o.type === 'buy' ? 'Full Purchase' : 'License'} · ${timeAgo(o.created)}</div>
       </div>
-      <div class="listing-row-price">$${o.amount}</div>
-      <span class="offer-status-badge ${badgeClass}">${o.status}</span>
+      <div class="listing-row-price">$${o.amount.toLocaleString()}</div>
+      <span class="badge ${bc}">${o.status}</span>
     </div>`;
   }).join('');
 }
 
-// ============================================================
+// ═══════════════════════════════════════
 // STATS
-// ============================================================
+// ═══════════════════════════════════════
 function updateStats() {
-  document.getElementById('stat-listings').textContent = db.listings.length;
-  document.getElementById('stat-sellers').textContent = new Set(db.listings.map(l => l.sellerId)).size;
-  document.getElementById('stat-offers').textContent = db.offers.length;
-
-  // Update filter badges
-  const langs = ['all','JavaScript','Python','TypeScript','CSS','HTML','Other'];
-  const fbMap = { all:'fb-all', JavaScript:'fb-js', Python:'fb-py', TypeScript:'fb-ts', CSS:'fb-css', HTML:'fb-html', Other:'fb-other' };
-  langs.forEach(lang => {
-    const el = document.getElementById(fbMap[lang]);
+  g('stat-listings').textContent = db.listings.length;
+  g('stat-sellers').textContent  = new Set(db.listings.map(l => l.sellerId)).size;
+  g('stat-offers').textContent   = db.offers.length;
+  ['all','JavaScript','TypeScript','Python','CSS','HTML','Other'].forEach(lang => {
+    const el = document.getElementById('fb-' + lang);
     if (el) el.textContent = lang === 'all' ? db.listings.length : db.listings.filter(l => l.lang === lang).length;
   });
 }
 
-// ============================================================
+// ═══════════════════════════════════════
 // MODALS
-// ============================================================
-function showModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-// Close on overlay click
+// ═══════════════════════════════════════
+function showModal(id)  { const m = document.getElementById(id); if (m) m.classList.add('open'); }
+function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.remove('open'); }
+function switchModals(fromId, toId) { closeModal(fromId); showModal(toId); return false; }
+
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
 });
 
-// ============================================================
+// ═══════════════════════════════════════
 // TOAST
-// ============================================================
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
+// ═══════════════════════════════════════
+let _tt;
+function toast(msg, type = '') {
+  const el = g('toast');
   el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  el.className   = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
-// ============================================================
-// UTILS
-// ============================================================
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+function g(id) { return document.getElementById(id); }
+
+function x(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function showErr(id, msg) {
+  const el = g(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? '' : 'none';
+}
+
+function langClass(lang) {
+  return { JavaScript:'lang-js', TypeScript:'lang-ts', Python:'lang-py', CSS:'lang-css', HTML:'lang-html' }[lang] || 'lang-other';
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
 function timeAgo(ts) {
-  const diff = Date.now() - ts;
-  if (diff < 60000) return 'just now';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
-  return Math.floor(diff/86400000) + 'd ago';
+  const d = Date.now() - ts;
+  if (d < 60000)       return 'just now';
+  if (d < 3600000)     return Math.floor(d / 60000) + 'm ago';
+  if (d < 86400000)    return Math.floor(d / 3600000) + 'h ago';
+  if (d < 2592000000)  return Math.floor(d / 86400000) + 'd ago';
+  return Math.floor(d / 2592000000) + 'mo ago';
 }
 
-// ============================================================
+// ═══════════════════════════════════════
 // INIT
-// ============================================================
+// ═══════════════════════════════════════
 load();
 updateNav();
 renderListings();
